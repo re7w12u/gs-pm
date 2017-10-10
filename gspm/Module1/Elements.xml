@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <Module Name="Module1" >
+    <File Path="Module1\gs-init.js" Url="SiteAssets/gs/gs-init.js" />
+    <File Path="Module1\gs-core.js" Url="SiteAssets/gs/gs-core.js" />
+  </Module>
+</Elements>

@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomAction
+    Id="GSCustomRibbonButton"
+    Location="CommandUI.Ribbon.ListView"
+    RegistrationId="100"
+    RegistrationType="List"
+    Sequence="100">
+    <CommandUIExtension>
+      
+      <CommandUIDefinitions>
+        <CommandUIDefinition Location="Ribbon.Tabs._children">
+          <Groups  Id="Ribbon.GSCustomRibbon.Groups">
+            <Group Id="Ribbon.GSCustomRibbon.Group"
+                   Description="GoSport Custom actions group"
+                   Title="Go Sport"
+                   Sequence="150"
+                   Template="Ribbon.Templates.CustomTemplate">
+              <Controls Id="Ribbon.GSCustomRibbon.controls">
+                <Button Id="Ribbon.GSCustomRibbon.Button.Validation"
+                        Command="GSCustomRibbon.ValidationCmd"
+                        Sequence="15"
+                        Image32by32="{siteUrl}/_layouts/15/1033/Images/formatMap32x32.png?rev=23"
+                        Image32by32Top="-33"
+                        Image32by32Left="-66"
+                        Description="Send to my manager for approbation"
+                        LabelText="Send to my manager"
+                        TemplateAlias="cust1"
+                    />
+              </Controls>
+
+            </Group>
+          </Groups>
+        </CommandUIDefinition>
+
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+          <GroupTemplate Id="Ribbon.Templates.CustomTemplate">
+            <Layout Title="FourLarge" LayoutTitle="FourLarge">
+              <Section Alignment="Top" Type="OneRow">
+                <Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="cust1" />
+                </Row>
+              </Section>
+            </Layout>
+          </GroupTemplate>
+        </CommandUIDefinition>
+      </CommandUIDefinitions>
+
+      <CommandUIHandlers>
+        <CommandUIHandler Command="GSCustomRibbon.ValidationCmd"
+                          CommandAction="javascript:alert('go sport!');">
+
+        </CommandUIHandler>
+      </CommandUIHandlers>
+
+    </CommandUIExtension>
+
+  </CustomAction>
+
+</Elements>
