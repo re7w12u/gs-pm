@@ -2,6 +2,6 @@
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
   <Module Name="Module1" >
     <File Path="Module1\gs-init.js" Url="SiteAssets/gs/gs-init.js" />
-    <File Path="Module1\gs-core.js" Url="SiteAssets/gs/gs-core.js" />
+    <File Path="Module1\logo-go_sports.jpg" Url="SiteAssets/gs/logo-go_sports.jpg" />
   </Module>
 </Elements>

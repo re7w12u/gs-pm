@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="eafd262d-7739-4313-883a-6c89cee42cd6" solutionId="eafd262d-7739-4313-883a-6c89cee42cd6" resetWebServer="false" sharePointProductVersion="15.0" name="gspm" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <features>
-    <featureReference itemId="22d2cc37-f530-4da0-8a41-3c5e17bee421" />
+    <featureReference itemId="dfc89cf8-0013-4c89-a2aa-d30b402e099a" />
   </features>
 </package>

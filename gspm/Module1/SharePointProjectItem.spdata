@@ -3,6 +3,6 @@
   <Files>
     <ProjectItemFile Source="Elements.xml" Target="Module1\" Type="ElementManifest" />
     <ProjectItemFile Source="gs-init.js" Target="Module1\" Type="ElementFile" />
-    <ProjectItemFile Source="gs-core.js" Target="Module1\" Type="ElementFile" />
+    <ProjectItemFile Source="logo-go_sports.jpg" Target="Module1\" Type="ElementFile" />
   </Files>
 </ProjectItem>

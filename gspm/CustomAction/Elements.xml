@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+
+  <CustomAction Id="GSCustomScript"
+                ScriptSrc="~SiteCollection/siteassets/gs/gs-init.js"
+                Location="ScriptLink" />
+
+
+  <CustomAction
+       Id="GS.SharePoint.Ribbon.GSPMS"
+       Location="CommandUI.Ribbon">
+    <CommandUIExtension>
+      <CommandUIDefinitions>
+        <CommandUIDefinition Location="Ribbon.Templates._children">
+          <GroupTemplate Id="Ribbon.Templates.OneLargeExample">
+            <Layout Title="NewGroupInExistingTabOneLarge" LayoutTitle="NewGroupInExistingTabOneLarge">
+              <Section Alignment="Top" Type="OneRow">
+                <Row>
+                  <ControlRef DisplayMode="Large" TemplateAlias="Button1" />
+                </Row>
+              </Section>
+            </Layout>
+          </GroupTemplate>
+        </CommandUIDefinition>
+
+        <CommandUIDefinition Location="Ribbon.List.Scaling._children">
+          <MaxSize  Id="GS.SharePoint.Ribbon.GSPMS.MaxSize"
+                    Sequence="15"
+                    GroupId="GS.SharePoint.Ribbon.GSPMS"
+                    Size="NewGroupInExistingTabOneLarge" />
+        </CommandUIDefinition>
+
+        <CommandUIDefinition Location="Ribbon.List.Groups._children">
+          <Group  Id="GS.SharePoint.Ribbon.GSPMS"
+                  Sequence="1050"
+                  Description="Used to demo adding a group"
+                  Title="Go Sport"
+                  Template="Ribbon.Templates.OneLargeExample">
+            <Controls Id="GS.SharePoint.Ribbon.GSPMS.Controls">
+              <Button Id="GS.SharePoint.Ribbon.GSPMS.StartWorkflow"
+                      Command="GS.Command.StartWorkflow"
+                      Sequence="10"
+                      Image16by16="/_layouts/15/images/discoveryUpdateStats_16x16.png"
+                      Image32by32="/_layouts/15/images/discoveryUpdateStats_32x32.png"
+                      Description="start worklow for validation"
+                      LabelText="Send to my manager"
+                      TemplateAlias="Button1" />
+            </Controls>
+          </Group>
+        </CommandUIDefinition>
+      </CommandUIDefinitions>
+      <CommandUIHandlers>
+        <CommandUIHandler
+                Command="GS.Command.StartWorkflow"
+                CommandAction="javascript:GSPMS.SendToManager();"/>
+      </CommandUIHandlers>
+    </CommandUIExtension>
+  </CustomAction>
+  
+</Elements>

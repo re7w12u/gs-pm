@@ -53,11 +53,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="EmptyElement1\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{ebca54c1-5403-43ae-86a2-d97a4cca891d}</SharePointProjectItemId>
+    <None Include="CustomAction\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{0dea4ad8-2467-47b2-b9df-e70ae50f4301}</SharePointProjectItemId>
     </None>
-    <None Include="Features\Feature1\Feature1.feature">
-      <FeatureId>{22d2cc37-f530-4da0-8a41-3c5e17bee421}</FeatureId>
+    <None Include="Features\Validation Button\Validation Button.feature">
+      <FeatureId>{dfc89cf8-0013-4c89-a2aa-d30b402e099a}</FeatureId>
     </None>
     <None Include="key.snk" />
     <None Include="Module1\SharePointProjectItem.spdata">
@@ -69,24 +69,16 @@
     <None Include="Package\Package.Template.xml">
       <DependentUpon>Package.package</DependentUpon>
     </None>
-    <None Include="ValidationButton\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{c5e42488-64cf-4ca5-bc03-e578e9ac03ac}</SharePointProjectItemId>
-    </None>
-    <None Include="ValidationMenu\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{bfbceb76-837e-4c13-b3c1-fee9162d3781}</SharePointProjectItemId>
-    </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="EmptyElement1\Elements.xml" />
-    <Content Include="Features\Feature1\Feature1.Template.xml">
-      <DependentUpon>Feature1.feature</DependentUpon>
+    <Content Include="CustomAction\Elements.xml" />
+    <Content Include="Features\Validation Button\Validation Button.Template.xml">
+      <DependentUpon>Validation Button.feature</DependentUpon>
     </Content>
     <Content Include="Module1\Elements.xml" />
-    <Content Include="Module1\gs-core.js" />
     <Content Include="Module1\gs-init.js" />
-    <Content Include="ValidationButton\Elements.xml" />
-    <Content Include="ValidationMenu\Elements.xml" />
+    <Content Include="Module1\logo-go_sports.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
