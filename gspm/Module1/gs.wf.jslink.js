@@ -18,30 +18,20 @@
     window.SPClientTemplates.TemplateManager.RegisterTemplateOverrides(siteCtx);
 })();
 
-//function renderField(ctx) {
 
-//    var WF = new GSWorkflow(ctx.CurrentItem.ID);
-//    WF.getStatus();
-
-//    var siteUrl = _spPageContextInfo.siteServerRelativeUrl;
-//    return "<div id=" + WF.getId() + "><img src='" + siteUrl + "/siteassets/gs/ajax-loader-fb.gif' /></div>";
-//}
 
 function GSWorkflowRenderer(ctx) {
 
     this.ctx = ctx;
     this.itemId = ctx.CurrentItem.ID;
     this.id = "GSLink" + this.itemId;
+    this.debug = true;
 
     this.getStatus = function () {
 
         var wfInternalName = this.ctx.ListSchema.Field.find(function (i) { return i.DisplayName == "Approbation 2010"; }).Name;
 
         var url = _spPageContextInfo.siteServerRelativeUrl + "/_api/web/lists('" + ctx.listName + "')/items(" + ctx.CurrentItem.ID + ")?$select=" + wfInternalName;
-        //$.getJSON(url)
-        //.done(function (r) {
-        //    console.log(r);
-        //});
 
         var self = this;
 
@@ -65,12 +55,12 @@ function GSWorkflowRenderer(ctx) {
                 //Approved = 16
                 //Rejected = 17
 
-                if (status != null && [2, 5, 16, 17].indexOf(status) > -1) {
-                    self.disable();
+                if (!this.debug && status != null && [2, 5, 16, 17].indexOf(status) > -1) {
+                    this.disable();
                 } else {
-                    self.enable();
+                    this.enable();
                 }
-            },
+            }.bind(this),
             error: function () {
                 alert("Failed to get customer");
             }
@@ -90,7 +80,7 @@ function GSWorkflowRenderer(ctx) {
         a.title = "submit to manager";
         a.href = "#";
 
-        // a.setAttribute('onclick', 'function(){ var x = new GSWorkflow(' + this.ctx.CurrentItem.ID + '); x.SendToManager(); }');
+        a.setAttribute('onclick', 'var x = new GSWorkflow(' + this.itemId + '); x.SendToManager();');
 
         var div = document.createElement("div");
         div.id = this.id;
@@ -104,17 +94,14 @@ function GSWorkflowRenderer(ctx) {
         var siteUrl = _spPageContextInfo.siteServerRelativeUrl;
         return "<div id=" + this.id + "><img src='" + siteUrl + "/siteassets/gs/ajax-loader-fb.gif' /></div>";
     }
-
-
 }
 
 
-function GSWorkflow(id) {
+function GSWorkflow(item_id) {
 
-    this.itemId = id;
+    this.itemId = item_id;
 
     this.web = null;
-    this.ctx = ctx;
     this.context = null;
     this.listId = null;
     this.list = null;
@@ -136,9 +123,9 @@ function GSWorkflow(id) {
         this.context.load(this.currentUser);
         this.context.load(this.item);
 
-        let self = this;
+//        let self = this;
         this.context.executeQueryAsync(
-            self.getManagerInfo,
+            this.getManagerInfo.bind(this),
             function (sender, args) {
                 console.error("ERROR 1: " + args.get_message());
             });
@@ -162,9 +149,9 @@ function GSWorkflow(id) {
             // get WF parameters
             var xml = self.getAssocData(managerName, managerId, login);
             // trigger WF
-            self.triggerWF(xml);
+            this.triggerWF(xml);
 
-        }, function (sender, args) {
+        }.bind(this), function (sender, args) {
             console.error("ERROR 3: " + args.get_message());
         });
     }
@@ -184,8 +171,8 @@ function GSWorkflow(id) {
         this.context.executeQueryAsync(function () {
             console.log("workflow started");
             SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
-            self.setItemAsReadOnly();
-        }, function (sender, args) {
+            this.setItemAsReadOnly();
+        }.bind(this), function (sender, args) {
             console.error("ERROR 2: " + args.get_message());
         });
     }
@@ -237,6 +224,9 @@ function GSWorkflow(id) {
     };
 
     this.setItemAsReadOnly = function () {
+
+        console.log("setItemAsReadOnly");
+
         //GSPMS.item.breakRoleInheritance(true);
         //GSPMS.item.get_roleAssignments().getByPrincipal(GSPMS.currentUser).deleteObject();
 
