@@ -68,7 +68,7 @@ function GSWorkflowRenderer(ctx) {
     }
 
     this.disable = function () {
-        $("#" + this.id).html("<div>WF already running</div>");        
+        $("#" + this.id).html("<div>WF already running</div>");
     }
 
     this.enable = function () {
@@ -123,12 +123,10 @@ function GSWorkflow(item_id) {
         this.context.load(this.currentUser);
         this.context.load(this.item);
 
-//        let self = this;
         this.context.executeQueryAsync(
             this.getManagerInfo.bind(this),
-            function (sender, args) {
-                console.error("ERROR 1: " + args.get_message());
-            });
+            function (sender, args) { console.error("ERROR 1: " + args.get_message()); }
+        );
     };
 
     this.getId = function () {
@@ -143,17 +141,16 @@ function GSWorkflow(item_id) {
 
         this.context.load(manager);
         let self = this;
-        this.context.executeQueryAsync(function () {
-            var login = manager.get_loginName();
-            var email = manager.get_email();
-            // get WF parameters
-            var xml = self.getAssocData(managerName, managerId, login);
-            // trigger WF
-            this.triggerWF(xml);
-
-        }.bind(this), function (sender, args) {
-            console.error("ERROR 3: " + args.get_message());
-        });
+        this.context.executeQueryAsync(
+            function () {
+                var login = manager.get_loginName();
+                var email = manager.get_email();
+                var xml = self.getAssocData(managerName, managerId, login);
+                this.triggerWF(xml);
+            }.bind(this),
+            function (sender, args) {
+                console.error("ERROR 3: " + args.get_message());
+            });
     }
 
     this.triggerWF = function (item, xml) {
@@ -168,13 +165,14 @@ function GSWorkflow(item_id) {
         //Start the Site Workflow by Passing the name of the Workflow and the initiation Parameters.
         interopService.startWorkflow(this.workflowName, null, this.listId, itemGuid, xml);
 
-        this.context.executeQueryAsync(function () {
-            console.log("workflow started");
-            SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
-            this.setItemAsReadOnly();
-        }.bind(this), function (sender, args) {
-            console.error("ERROR 2: " + args.get_message());
-        });
+        this.context.executeQueryAsync(
+            function () {
+                SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
+                this.setItemAsReadOnly();
+            }.bind(this),
+            function (sender, args) {
+                console.error("ERROR 2: " + args.get_message());
+            });
     }
 
     this.getAssocData = function (name, id, login) {
@@ -245,8 +243,6 @@ function GSWorkflow(item_id) {
         //    console.error("ERROR 4 : " + args.get_message());
         //});
     }
-
-
 
     // run this method to start all process
     this.SendToManager = function () {
