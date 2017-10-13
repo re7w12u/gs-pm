@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+  <Field Type="Text" DisplayName="GS Workflow Button" Name="GS_WF" Group="GoSport" Required="false" JSLink="~sitecollection/SiteAssets/gs/gs.wf.jslink.js" ID="{F475275A-A4A0-4A68-AC6E-DB39F5450029}"/>
+
+
+</Elements>

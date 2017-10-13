@@ -4,5 +4,8 @@
     <ProjectItemFile Source="Elements.xml" Target="Module1\" Type="ElementManifest" />
     <ProjectItemFile Source="gs-init.js" Target="Module1\" Type="ElementFile" />
     <ProjectItemFile Source="logo-go_sports.jpg" Target="Module1\" Type="ElementFile" />
+    <ProjectItemFile Source="gs.wf.jslink.js" Target="Module1\" Type="ElementFile" />
+    <ProjectItemFile Source="jquery-3.2.1.min.js" Target="Module1\" Type="ElementFile" />
+    <ProjectItemFile Source="ajax-loader-fb.gif" Target="Module1\" Type="ElementFile" />
   </Files>
 </ProjectItem>

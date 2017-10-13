@@ -13,6 +13,7 @@
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <IncludeAssemblyInPackage>False</IncludeAssemblyInPackage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,6 +57,9 @@
     <None Include="CustomAction\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{0dea4ad8-2467-47b2-b9df-e70ae50f4301}</SharePointProjectItemId>
     </None>
+    <None Include="Definitions\Fields\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{5907004f-0110-47bf-bd25-dc2a8b5a26b9}</SharePointProjectItemId>
+    </None>
     <None Include="Features\Validation Button\Validation Button.feature">
       <FeatureId>{dfc89cf8-0013-4c89-a2aa-d30b402e099a}</FeatureId>
     </None>
@@ -73,12 +77,17 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="CustomAction\Elements.xml" />
+    <Content Include="Definitions\Fields\Elements.xml" />
     <Content Include="Features\Validation Button\Validation Button.Template.xml">
       <DependentUpon>Validation Button.feature</DependentUpon>
     </Content>
+    <Content Include="Module1\ajax-loader-fb.gif" />
     <Content Include="Module1\Elements.xml" />
     <Content Include="Module1\gs-init.js" />
+    <Content Include="Module1\gs.wf.jslink.js" />
+    <Content Include="Module1\jquery-3.2.1.min.js" />
     <Content Include="Module1\logo-go_sports.jpg" />
+    <Content Include="XMLFile1.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

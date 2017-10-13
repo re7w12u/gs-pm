@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
 
+  <CustomAction Id="GSJqueryScript"
+                ScriptSrc="~SiteCollection/siteassets/gs/jquery-3.2.1.min.js"
+                Location="ScriptLink" />
+  
 
   <CustomAction Id="GSCustomScript"
                 ScriptSrc="~SiteCollection/siteassets/gs/gs-init.js"
