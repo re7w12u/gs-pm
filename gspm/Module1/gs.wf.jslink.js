@@ -272,11 +272,11 @@ function GSWorkflow(item_id) {
         if (loginName != null) {
                         
             var assocData = this.getAssocData(approverName, loginName);
-            var fileRef = 
+            var fileRef = "http://" + location.host + this.item.get_item("FileRef");
 
             $().SPServices({
                 operation: "StartWorkflow",
-                item: _spPageContextInfo.siteAbsoluteUrl + "/Lists/cadeaux/" + this.itemId+ "_.000",
+                item: fileRef,
                 templateId: this.wfDefinitionId,
                 workflowParameters: assocData,
                 completefunc: this.onWFStarted.bind(this)
