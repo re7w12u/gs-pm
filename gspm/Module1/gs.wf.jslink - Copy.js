@@ -16,16 +16,16 @@
 
     //register the template to render custom field
     window.SPClientTemplates.TemplateManager.RegisterTemplateOverrides(siteCtx);
+
+    
 })();
 
 function loadLibraries(ctx) {
-    // ensure WF library loading 
+// ensure WF library loading 
     SP.SOD.executeOrDelayUntilScriptLoaded(function () {
         SP.SOD.registerSod('sp.workflowservices.js', SP.Utilities.Utility.getLayoutsPageUrl("sp.workflowservices.js"));
         SP.SOD.registerSod('jquery.js', ctx.HttpRoot + "/siteassets/gs/jquery-3.2.1.min.js");
         SP.SOD.registerSod('jquery.spservices.js', ctx.HttpRoot + "/siteassets/gs/jquery.SPServices.js");
-
-        SP.SOD.registerSodDep('jquery.spservices.js', 'jquery.js');             
 
         SP.SOD.executeFunc('sp.workflowservices.js', "SP.WorkflowServices.WorkflowServicesManager", null);
         SP.SOD.executeFunc('jquery.js', null, null);
@@ -165,6 +165,7 @@ function GSWorkflow(item_id) {
                 var login = manager.get_loginName();
                 var email = manager.get_email();
                 var xml = self.getAssocData(managerName, login);
+                console.log(xml);
                 this.spservices(managerName, login);
                 //this.triggerWF(xml);
             }.bind(this),
@@ -199,7 +200,7 @@ function GSWorkflow(item_id) {
     }
 
     this.getAssocData = function (name, login) {
-        
+
         var assocData = '<dfs:myFields xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dms="http://schemas.microsoft.com/office/2009/documentManagement/types" xmlns:dfs="http://schemas.microsoft.com/office/infopath/2003/dataFormSolution" xmlns:q="http://schemas.microsoft.com/office/infopath/2009/WSSList/queryFields" xmlns:d="http://schemas.microsoft.com/office/infopath/2009/WSSList/dataFields" xmlns:ma="http://schemas.microsoft.com/office/2009/metadata/properties/metaAttributes" xmlns:pc="http://schemas.microsoft.com/office/infopath/2007/PartnerControls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
                         '<dfs:queryFields></dfs:queryFields>' +
                         '<dfs:dataFields>' +
@@ -270,29 +271,31 @@ function GSWorkflow(item_id) {
     this.spservices = function (approverName, loginName) {
 
         if (loginName != null) {
-                        
             var assocData = this.getAssocData(approverName, loginName);
-            var fileRef = 
+            var fileRef = this.item.get_item("FileRef");
 
-            $().SPServices({
-                operation: "StartWorkflow",
-                item: _spPageContextInfo.siteAbsoluteUrl + "/Lists/cadeaux/" + this.itemId+ "_.000",
-                templateId: this.wfDefinitionId,
-                workflowParameters: assocData,
-                completefunc: this.onWFStarted.bind(this)
-            });
-
-
-
+            if ($().SPServices != undefined) {
+                $().SPServices({
+                    operation: "StartWorkflow",
+                    item: fileRef,
+                    templateId: this.wfDefinitionId,
+                    workflowParameters: assocData,
+                    completefunc: function () {
+                        window.setTimeout(function () {
+                            window.location.href = '/sites/gs/Lists/cadeaux';
+                        }, 3000)
+                    }
+                });
+            } else {
+                console.error("SPServices is undefined...");
+            }
         };
-    }
-
-    this.onWFStarted = function () {
-        SP.UI.Notify.addNotification('Your element has been submitted to your manager.<br>Your page will be automatically refreshed...', false);
-        setTimeout(function () {
-            //this.setItemAsReadOnly();
-            location.reload(true);
-        }.bind(this), 1000);
-
     };
+
+    this.onWorkFlowStarted = function () {
+        window.setTimeout(function () {
+            window.location.href = '/sites/gs/Lists/cadeaux';
+        }, 3000)
+    };
+
 }

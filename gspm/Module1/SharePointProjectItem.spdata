@@ -8,5 +8,6 @@
     <ProjectItemFile Source="jquery-3.2.1.min.js" Target="Module1\" Type="ElementFile" />
     <ProjectItemFile Source="ajax-loader-fb.gif" Target="Module1\" Type="ElementFile" />
     <ProjectItemFile Source="jquery.SPServices.js" Target="Module1\" Type="ElementFile" />
+    <ProjectItemFile Source="gs.wf.jslink - Copy.js" Target="Module1\" Type="ElementFile" />
   </Files>
 </ProjectItem>

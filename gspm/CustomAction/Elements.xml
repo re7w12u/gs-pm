@@ -4,16 +4,16 @@
   <CustomAction Id="GSJqueryScript"
                 ScriptSrc="~SiteCollection/siteassets/gs/jquery-3.2.1.min.js"
                 Location="ScriptLink" />
-  
 
-  <CustomAction Id="GSCustomScript"
+
+  <!--<CustomAction Id="GSCustomScript"
                 ScriptSrc="~SiteCollection/siteassets/gs/gs-init.js"
                 Location="ScriptLink" />
 
 
   <CustomAction Id="SPServices"
                 ScriptSrc="~SiteCollection/siteassets/gs/jquery.SPServices.js"
-                Location="ScriptLink" />
+                Location="ScriptLink" />-->
 
   <!--<CustomAction
        Id="GS.SharePoint.Ribbon.GSPMS"
@@ -65,5 +65,5 @@
       </CommandUIHandlers>
     </CommandUIExtension>
   </CustomAction>-->
-  
+
 </Elements>

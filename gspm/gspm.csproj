@@ -84,6 +84,7 @@
     <Content Include="Module1\ajax-loader-fb.gif" />
     <Content Include="Module1\Elements.xml" />
     <Content Include="Module1\gs-init.js" />
+    <Content Include="Module1\gs.wf.jslink - Copy.js" />
     <Content Include="Module1\gs.wf.jslink.js" />
     <Content Include="Module1\jquery-3.2.1.min.js" />
     <Content Include="Module1\jquery.SPServices.js" />
