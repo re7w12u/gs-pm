@@ -6,5 +6,6 @@
     <File Path="Module1\gs.wf.jslink.js" Url="SiteAssets/gs/gs.wf.jslink.js" />
     <File Path="Module1\jquery-3.2.1.min.js" Url="SiteAssets/gs/jquery-3.2.1.min.js" />
     <File Path="Module1\ajax-loader-fb.gif" Url="SiteAssets/gs/ajax-loader-fb.gif" />
+    <File Path="Module1\jquery.SPServices.js" Url="SiteAssets/gs/jquery.SPServices.js" />
   </Module>
 </Elements>

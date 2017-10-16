@@ -11,7 +11,11 @@
                 Location="ScriptLink" />
 
 
-  <CustomAction
+  <CustomAction Id="SPServices"
+                ScriptSrc="~SiteCollection/siteassets/gs/jquery.SPServices.js"
+                Location="ScriptLink" />
+
+  <!--<CustomAction
        Id="GS.SharePoint.Ribbon.GSPMS"
        Location="CommandUI.Ribbon">
     <CommandUIExtension>
@@ -60,6 +64,6 @@
                 CommandAction="javascript:GSPMS.SendToManager();"/>
       </CommandUIHandlers>
     </CommandUIExtension>
-  </CustomAction>
+  </CustomAction>-->
   
 </Elements>
