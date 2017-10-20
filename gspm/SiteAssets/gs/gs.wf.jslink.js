@@ -74,15 +74,23 @@ function GSWorkflowRenderer(ctx) {
                 //Approved = 16
                 //Rejected = 17
 
-                if (this.debug || status == undefined || status == 0) this.enable();
-                else this.disable(status);
+                // if (this.debug || status == undefined || status == 0) this.enable();
+                // else this.disable(status);
+
+                var ro = $("<a href='#' id='RO" + this.itemId + "'>READONLY</a>");
+                ro.click(function () {
+                    var gs = new GSWorkflow(this.itemId);
+                    gs.setItemAsReadOnly();
+                }.bind(this));
+                $("#" + this.id).append(ro);
 
             }.bind(this),
             error: function () {
                 console.error("Failed to get workflow status");
             }
         });
-    }
+
+    }.bind(this);
 
     this.disable = function (status) {
         var siteUrl = _spPageContextInfo.siteServerRelativeUrl;
@@ -122,26 +130,12 @@ function GSWorkflowRenderer(ctx) {
     }.bind(this);
 
     this.shake = function (id) {
-        
         function wiggleForOneSecond(el) {
             el.ClassyWiggle();
             setTimeout(function () { el.ClassyWiggle('stop') }, 1000)
         }
+        setInterval(function () { wiggleForOneSecond($('#' + id)) }, 5000);
 
-        setInterval(function () { wiggleForOneSecond($('#'+ id)) }, 5000);
-
-
-
-        //var classname = 'shake';
-        //var icon = $("#" + id);
-        //if (icon.hasClass(classname)) {
-        //    icon.removeClass(classname);
-        //    setTimeout(self.shake.bind(this, id), 3000);
-        //}
-        //else {
-        //    icon.addClass(classname);
-        //    setTimeout(self.shake.bind(this, id), 1000);
-        //}
     }.bind(this);
 
     this.render = function () {
@@ -175,6 +169,11 @@ function GSWorkflow(item_id) {
     //wfDefinitionId = "{67786373-1EA1-452B-8495-2EB736BB0703}";
 
     this.getItem = function () {
+        var d = $.Deferred();
+
+        if (SP.ClientContext != undefined)
+            this.context = SP.ClientContext.get_current();
+
         this.listId = SP.ListOperation.Selection.getSelectedList();
 
         this.web = this.context.get_web();
@@ -182,13 +181,16 @@ function GSWorkflow(item_id) {
         this.item = this.list.getItemById(this.itemId);
         this.currentUser = this.web.get_currentUser();
 
+        this.context.load(this.web);
         this.context.load(this.currentUser);
         this.context.load(this.item);
 
         this.context.executeQueryAsync(
-            this.getManagerInfo.bind(this),
+            function () { d.resolve() }.bind(this), //this.getManagerInfo.bind(this),
             function (sender, args) { console.error("ERROR 1: " + args.get_message()); }
         );
+
+        return d.promise();
     };
 
     this.getId = function () {
@@ -277,10 +279,51 @@ function GSWorkflow(item_id) {
     };
 
     this.setItemAsReadOnly = function () {
+        this.getItem().done(function () {
+            // break inheritance
+            this.item.breakRoleInheritance(true);
 
-        console.log("setItemAsReadOnly");
+            var roleAss = this.item.get_roleAssignments();
+            var roleDef = this.web.get_roleDefinitions();
 
-        //GSPMS.item.breakRoleInheritance(true);
+            this.context.load(roleAss, 'Include(Member)');
+            this.context.load(roleDef);
+            this.context.executeQueryAsync(Function.createDelegate(this, function () {
+
+                // remove all but owners
+                var roleAssEnum = roleAss.getEnumerator();
+                while (roleAssEnum.moveNext()) {
+                    var currentAss = roleAssEnum.get_current();
+                    // filter groups only
+                    var member = currentAss.get_member();
+                    if (member.get_principalType() == SP.Utilities.PrincipalType.sharePointGroup) {
+                        // keep owners anyhow
+                        if (member.get_loginName().indexOf('Owners') == -1) {
+                            roleAss.getByPrincipalId(member.get_id()).deleteObject();
+                        }
+                    }
+                }
+
+
+                // add current user as read only                
+                var readRole = roleDef.getByName('Read');
+                var collRoleDefinitionBinding = SP.RoleDefinitionBindingCollection.newObject(this.context);
+                collRoleDefinitionBinding.add(readRole);
+                this.item.get_roleAssignments().add(this.currentUser, collRoleDefinitionBinding);
+
+                this.context.executeQueryAsync(
+                    Function.createDelegate(this, function () {
+                        SP.UI.Notify.addNotification('Your item has been set to read only.', false);
+                    }),
+                    Function.createDelegate(this, function (s, a) {
+                        console.error(a.get_message());
+                }));
+
+            }));
+
+        }.bind(this));
+
+        //
         //GSPMS.item.get_roleAssignments().getByPrincipal(GSPMS.currentUser).deleteObject();
 
         ////var collRoleDefinitionBinding = SP.RoleDefinitionBindingCollection.newObject(GSPMS.context)
@@ -301,12 +344,7 @@ function GSWorkflow(item_id) {
 
     // run this method to start all process
     this.SendToManager = function () {
-
-        if (SP.ClientContext != undefined)
-            this.context = SP.ClientContext.get_current();
-
-        this.getItem();
-
+        this.getItem().done(this.getManagerInfo.bind(this));
     };
 
     ///https://gist.github.com/madhur/1584225
