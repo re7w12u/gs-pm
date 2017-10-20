@@ -74,15 +74,15 @@ function GSWorkflowRenderer(ctx) {
                 //Approved = 16
                 //Rejected = 17
 
-                // if (this.debug || status == undefined || status == 0) this.enable();
-                // else this.disable(status);
+                if (this.debug || status == undefined || status == 0) this.enable();
+                else this.disable(status);
 
-                var ro = $("<a href='#' id='RO" + this.itemId + "'>READONLY</a>");
-                ro.click(function () {
-                    var gs = new GSWorkflow(this.itemId);
-                    gs.setItemAsReadOnly();
-                }.bind(this));
-                $("#" + this.id).append(ro);
+                //var ro = $("<a href='#' id='RO" + this.itemId + "'>READONLY</a>");
+                //ro.click(function () {
+                //    var gs = new GSWorkflow(this.itemId);
+                //    gs.setItemAsReadOnly();
+                //}.bind(this));
+                //$("#" + this.id).append(ro);
 
             }.bind(this),
             error: function () {
@@ -217,32 +217,7 @@ function GSWorkflow(item_id) {
                 console.error("ERROR 3: " + args.get_message());
             });
     }
-
-    this.triggerWF = function (xml) {
-
-        //Workflow Services Manager
-        var wfServicesManager = new SP.WorkflowServices.WorkflowServicesManager(this.context, this.web);
-
-        //Workflow Interop Service used to interact with SharePoint 2010 Engine Workflows
-        var interopService = wfServicesManager.getWorkflowInteropService()
-        itemGuid = this.item.get_item("GUID").toString();
-        //Start the Site Workflow by Passing the name of the Workflow and the initiation Parameters.
-        interopService.startWorkflow(this.workflowName, null, this.listId, itemGuid, xml);
-
-        this.context.executeQueryAsync(
-            function () {
-                SP.UI.Notify.addNotification('Your element has been submitted to your manager.<br>Your page will be automatically refreshed...', false);
-                setTimeout(function () {
-                    this.setItemAsReadOnly();
-                    location.reload(true);
-                }.bind(this), 1000);
-
-            }.bind(this),
-            function (sender, args) {
-                console.error("ERROR 2: " + args.get_message());
-            });
-    }
-
+    
     this.getAssocData = function (name, login) {
 
         var assocData = '<dfs:myFields xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dms="http://schemas.microsoft.com/office/2009/documentManagement/types" xmlns:dfs="http://schemas.microsoft.com/office/infopath/2003/dataFormSolution" xmlns:q="http://schemas.microsoft.com/office/infopath/2009/WSSList/queryFields" xmlns:d="http://schemas.microsoft.com/office/infopath/2009/WSSList/dataFields" xmlns:ma="http://schemas.microsoft.com/office/2009/metadata/properties/metaAttributes" xmlns:pc="http://schemas.microsoft.com/office/infopath/2007/PartnerControls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
@@ -313,11 +288,11 @@ function GSWorkflow(item_id) {
 
                 this.context.executeQueryAsync(
                     Function.createDelegate(this, function () {
-                        SP.UI.Notify.addNotification('Your item has been set to read only.', false);
+                        SP.UI.Notify.addNotification('Your item has been set to read only.<br>Your page will be automatically refreshed...', false);
                     }),
                     Function.createDelegate(this, function (s, a) {
                         console.error(a.get_message());
-                }));
+                    }));
 
             }));
 
@@ -369,13 +344,30 @@ function GSWorkflow(item_id) {
     }
 
     this.onWFStarted = function () {
-        SP.UI.Notify.addNotification('Your element has been submitted to your manager.<br>Your page will be automatically refreshed...', false);
-        setTimeout(function () {
-            //this.setItemAsReadOnly();
-            location.reload(true);
-        }.bind(this), 1000);
-
+        SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
+        this.setItemAsReadOnly();
+        setTimeout(function () { location.reload(true); }, 3000);
     };
+
+
+    // Attempt to start workflow using client API... not to avail !!
+    //this.triggerWF = function (xml) {
+
+    //    //Workflow Services Manager
+    //    var wfServicesManager = new SP.WorkflowServices.WorkflowServicesManager(this.context, this.web);
+
+    //    //Workflow Interop Service used to interact with SharePoint 2010 Engine Workflows
+    //    var interopService = wfServicesManager.getWorkflowInteropService()
+    //    itemGuid = this.item.get_item("GUID").toString();
+    //    //Start the Site Workflow by Passing the name of the Workflow and the initiation Parameters.
+    //    interopService.startWorkflow(this.workflowName, null, this.listId, itemGuid, xml);
+
+    //    this.context.executeQueryAsync(
+    //        this.onWFStarted.bind(this),
+    //        function (sender, args) {
+    //            console.error("ERROR 2: " + args.get_message());
+    //        });
+    //}
 }
 
 function GSWorkFlowNewFormRenderer(ctx) {
