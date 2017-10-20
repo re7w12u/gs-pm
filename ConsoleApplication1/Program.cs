@@ -30,7 +30,7 @@ namespace ConsoleApplication1
             string workflowName = "Approbation 2010";
 
             //Name of the List to which the Workflow is Associated
-            string targetListName = "cadeaux";
+            string targetListName = "Liste des demandes";
 
             //Guid of the List to which the Workflow is Associated
             Guid targetListGUID = new Guid("cbe00484-055e-4dca-ade1-863ef7b202ba");
@@ -60,7 +60,7 @@ namespace ConsoleApplication1
                 WorkflowServicesManager wfServicesManager = new WorkflowServicesManager(clientContext, web);
 
                 //Will return all Workflow Associations which are running on the SharePoint 2010 Engine
-                WorkflowAssociationCollection wfAssociations = web.Lists.GetByTitle(targetListName).WorkflowAssociations;
+                WorkflowAssociationCollection wfAssociations = list.WorkflowAssociations;
 
                 //Get the required Workflow Association
                 WorkflowAssociation wfAssociation = wfAssociations.GetByName(workflowName);

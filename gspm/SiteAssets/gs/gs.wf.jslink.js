@@ -1,4 +1,7 @@
-﻿(function () {
+﻿var GSG = GSG || {};
+GSG.renderer = [];
+
+(function () {
     if (typeof window.SPClientTemplates === 'undefined')
         return;
 
@@ -9,6 +12,7 @@
         'GS_WF': {
             'View': function () {
                 var r = new GSWorkflowRenderer(ctx);
+                GSG.renderer.push(r);
                 return r.render();
             },
             //'NewForm': function () {
@@ -36,8 +40,14 @@ function loadLibraries(ctx) {
         SP.SOD.executeFunc('sp.workflowservices.js', "SP.WorkflowServices.WorkflowServicesManager", null);
         SP.SOD.executeFunc('jquery.js', null, null);
         SP.SOD.executeFunc('jquery.spservices.js', null, null);
-        SP.SOD.executeFunc('jquery.classywiggle.js', null, null);
+        SP.SOD.executeFunc('jquery.classywiggle.js', null, EnsureGSGRender);
     }, "SP.js");
+}
+
+function EnsureGSGRender() {
+    for (var i = 0; i < GSG.renderer.length; i++) {
+        GSG.renderer[i].getStatus();
+    }
 }
 
 function GSWorkflowRenderer(ctx) {
@@ -52,7 +62,7 @@ function GSWorkflowRenderer(ctx) {
         var wfInternalName = this.ctx.ListSchema.Field.find(function (i) { return i.DisplayName == "Approbation 2010"; }).Name;
         //var wfInternalName = this.ctx.ListSchema.Field.find(function (i) { return i.DisplayName == "Approval 2010"; }).Name;
 
-        var url = _spPageContextInfo.siteServerRelativeUrl + "/_api/web/lists('" + ctx.listName + "')/items(" + ctx.CurrentItem.ID + ")?$select=" + wfInternalName;
+        var url = _spPageContextInfo.siteServerRelativeUrl + "/_api/web/lists('" + ctx.listName + "')/items(" + this.itemId + ")?$select=" + wfInternalName;
 
         $.ajax({
             url: url,
@@ -139,7 +149,7 @@ function GSWorkflowRenderer(ctx) {
     }.bind(this);
 
     this.render = function () {
-        this.getStatus();
+        //this.getStatus();
         var siteUrl = _spPageContextInfo.siteServerRelativeUrl;
         return "<div id=" + this.id + " style='text-align: center;'><img src='" + siteUrl + "/siteassets/gs/ajax-loader-fb.gif' /></div>";
     }
@@ -147,8 +157,25 @@ function GSWorkflowRenderer(ctx) {
 
 function GSWorkflow(item_id) {
 
-    this.itemId = item_id;
+    /***** PARAMETERS *****/
+    // config rdits-sp13-dev2 - JULIEN
+    //this.workflowName = "Approbation 2010";
+    //this.wfDefinitionId = "{98D90551-EA55-46A3-A6D0-743C30C008DA}";
+    //this.managerInternalField = "Manager";
 
+    //// config rdits-sp13-dev3 - CLE
+    //this.workflowName = "Approval 2010";
+    //this.wfDefinitionId = "{E47E17E2-B00D-4D61-BED9-065B3DDC1849}";
+
+    // jbes online
+    this.workflowName = "Approbation 2010";
+    this.wfDefinitionId = "{9279E1FF-1D32-4423-85B7-C7F21998A701}";
+    this.managerInternalField = "Nom_x0020_du_x0020_manager";
+
+
+    /****** END OF PARAMETERS - DO NOT EDIT BELOW UNLESS YOU KNOW MORE OR LESS WHAT YOU ARE DOING *****/
+
+    this.itemId = item_id;
     this.web = null;
     this.context = null;
     this.listId = null;
@@ -157,17 +184,6 @@ function GSWorkflow(item_id) {
     this.workflow = null;
     this.currentUser = null;
     this.manager = null;
-
-    // config rdits-sp13-dev2 - JULIEN
-    this.workflowName = "Approbation 2010";
-    this.wfDefinitionId = "{98D90551-EA55-46A3-A6D0-743C30C008DA}";
-
-    //// config rdits-sp13-dev3 - CLE
-    //this.workflowName = "Approval 2010";
-    //this.wfDefinitionId = "{E47E17E2-B00D-4D61-BED9-065B3DDC1849}";
-
-
-    //wfDefinitionId = "{67786373-1EA1-452B-8495-2EB736BB0703}";
 
     this.getItem = function () {
         var d = $.Deferred();
@@ -202,7 +218,7 @@ function GSWorkflow(item_id) {
         var d = $.Deferred();
         // get selected manager info
         //var managerName = this.item.get_item("Manager").get_lookupValue();
-        var managerId = this.item.get_item("Manager").get_lookupId();
+        var managerId = this.item.get_item(this.managerInternalField).get_lookupId();
         this.manager = this.web.getUserById(managerId);
 
         this.context.load(this.manager);
@@ -221,7 +237,7 @@ function GSWorkflow(item_id) {
                         '<d:Approvers>' +
                         '<d:Assignment>' +
                         '<d:Assignee>' +
-                        '<pc:Person><pc:DisplayName></pc:DisplayName><pc:AccountId>' + login + '</pc:AccountId><pc:AccountType>User</pc:AccountType></pc:Person>' +
+                        '<pc:Person><pc:DisplayName>' + name + '</pc:DisplayName><pc:AccountId>' + login + '</pc:AccountId><pc:AccountType>User</pc:AccountType></pc:Person>' +
                         '</d:Assignee>' +
                         '<d:Stage xsi:nil="true" />' +
                         '<d:AssignmentType>Serial</d:AssignmentType>' +
@@ -281,7 +297,7 @@ function GSWorkflow(item_id) {
 
                 this.item.get_roleAssignments().add(this.currentUser, collRoleDefinitionBinding);
                 this.item.get_roleAssignments().add(this.manager, collRoleDefinitionBinding);
-                
+
                 this.context.executeQueryAsync(
                     Function.createDelegate(this, function () {
                         SP.UI.Notify.addNotification('Your item has been set to read only.<br>Your page will be automatically refreshed...', false);
@@ -292,7 +308,7 @@ function GSWorkflow(item_id) {
 
             }));
 
-        }.bind(this));  
+        }.bind(this));
     }
 
     // run this method to start all process
@@ -334,7 +350,7 @@ function GSWorkflow(item_id) {
     this.onWFStarted = function () {
         SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
         this.setItemAsReadOnly();
-        setTimeout(function () { location.reload(true); }, 3000);
+        //setTimeout(function () { location.reload(true); }, 3000);
     };
 
 
