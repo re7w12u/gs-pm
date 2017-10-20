@@ -23,19 +23,6 @@
 })();
 
 function loadLibraries(ctx) {
-    // load css
-    var cssId = 'gsCss';  // you could encode the css path itself to generate id..
-    if (!document.getElementById(cssId)) {
-        var head = document.getElementsByTagName('head')[0];
-        var link = document.createElement('link');
-        link.id = cssId;
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        link.href = ctx.HttpRoot + "/siteassets/gs/gs.css";
-        link.media = 'all';
-        head.appendChild(link);
-    }
-
     // ensure WF library loading 
     SP.SOD.executeOrDelayUntilScriptLoaded(function () {
         SP.SOD.registerSod('sp.workflowservices.js', SP.Utilities.Utility.getLayoutsPageUrl("sp.workflowservices.js"));

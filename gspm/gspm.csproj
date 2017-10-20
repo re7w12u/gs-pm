@@ -84,8 +84,6 @@
     <Content Include="SiteAssets\gs\ajax-loader-fb.gif" />
     <Content Include="SiteAssets\Elements.xml" />
     <Content Include="SiteAssets\gs\gs-init.js" />
-    <Content Include="SiteAssets\gs\gs.css" />
-    <Content Include="SiteAssets\gs\gs.wf.jslink - Copy.js" />
     <Content Include="SiteAssets\gs\gs.wf.jslink.js" />
     <Content Include="SiteAssets\gs\jquery-3.2.1.min.js" />
     <Content Include="SiteAssets\gs\jquery.classywiggle.js" />
