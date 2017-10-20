@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <Module Name="SiteAssets" >
+    <File Path="SiteAssets\gs\gs-init.js" Url="SiteAssets/gs/gs-init.js" />
+    <File Path="SiteAssets\gs\logo-go_sports.jpg" Url="SiteAssets/gs/logo-go_sports.jpg" />
+    <File Path="SiteAssets\gs\gs.wf.jslink.js" Url="SiteAssets/gs/gs.wf.jslink.js" />
+    <File Path="SiteAssets\gs\jquery-3.2.1.min.js" Url="SiteAssets/gs/jquery-3.2.1.min.js" />
+    <File Path="SiteAssets\gs\ajax-loader-fb.gif" Url="SiteAssets/gs/ajax-loader-fb.gif" />
+    <File Path="SiteAssets\gs\jquery.SPServices.js" Url="SiteAssets/gs/jquery.SPServices.js" />
+    <File Path="SiteAssets\gs\wf_in_progress_16x16.jpg" Url="SiteAssets/gs/wf_in_progress_16x16.jpg" />
+    <File Path="SiteAssets\gs\gs.css" Url="SiteAssets/gs/gs.css" />
+    <File Path="SiteAssets\gs\jquery.classywiggle.js" Url="SiteAssets/gs/jquery.classywiggle.js" />
+  </Module>
+</Elements>

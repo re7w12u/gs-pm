@@ -1,8 +1,8 @@
 ﻿(function () {
     if (typeof window.SPClientTemplates === 'undefined')
         return;
-    var siteCtx = {};
 
+    var siteCtx = {};
     siteCtx.Templates = {};
     siteCtx.OnPreRender = loadLibraries;
     siteCtx.Templates.Fields = {
@@ -10,7 +10,11 @@
             'View': function () {
                 var r = new GSWorkflowRenderer(ctx);
                 return r.render();
-            }
+            },
+            //'NewForm': function () {
+            //    var n = new GSWorkFlowNewFormRenderer(ctx)
+            //    return n.init();
+            //}
         }
     };
 
@@ -19,17 +23,33 @@
 })();
 
 function loadLibraries(ctx) {
+    // load css
+    var cssId = 'gsCss';  // you could encode the css path itself to generate id..
+    if (!document.getElementById(cssId)) {
+        var head = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.id = cssId;
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = ctx.HttpRoot + "/siteassets/gs/gs.css";
+        link.media = 'all';
+        head.appendChild(link);
+    }
+
     // ensure WF library loading 
     SP.SOD.executeOrDelayUntilScriptLoaded(function () {
         SP.SOD.registerSod('sp.workflowservices.js', SP.Utilities.Utility.getLayoutsPageUrl("sp.workflowservices.js"));
         SP.SOD.registerSod('jquery.js', ctx.HttpRoot + "/siteassets/gs/jquery-3.2.1.min.js");
         SP.SOD.registerSod('jquery.spservices.js', ctx.HttpRoot + "/siteassets/gs/jquery.SPServices.js");
+        SP.SOD.registerSod('jquery.classywiggle.js', ctx.HttpRoot + "/siteassets/gs/jquery.classywiggle.js");
 
-        SP.SOD.registerSodDep('jquery.spservices.js', 'jquery.js');             
+        SP.SOD.registerSodDep('jquery.spservices.js', 'jquery.js');
+        SP.SOD.registerSodDep('jquery.classywiggle.js', 'jquery.js');
 
         SP.SOD.executeFunc('sp.workflowservices.js', "SP.WorkflowServices.WorkflowServicesManager", null);
         SP.SOD.executeFunc('jquery.js', null, null);
         SP.SOD.executeFunc('jquery.spservices.js', null, null);
+        SP.SOD.executeFunc('jquery.classywiggle.js', null, null);
     }, "SP.js");
 }
 
@@ -38,7 +58,7 @@ function GSWorkflowRenderer(ctx) {
     this.ctx = ctx;
     this.itemId = ctx.CurrentItem.ID;
     this.id = "GSLink" + this.itemId;
-    this.debug = true;
+    this.debug = false;
 
     this.getStatus = function () {
 
@@ -67,29 +87,40 @@ function GSWorkflowRenderer(ctx) {
                 //Approved = 16
                 //Rejected = 17
 
-                if (!this.debug && status != null && [2, 5, 16, 17].indexOf(status) > -1) {
-                    this.disable();
-                } else {
-                    this.enable();
-                }
+                if (this.debug || status == undefined || status == 0) this.enable();
+                else this.disable(status);
+
             }.bind(this),
             error: function () {
-                alert("Failed to get customer");
+                console.error("Failed to get workflow status");
             }
         });
     }
 
-    this.disable = function () {
-        $("#" + this.id).html("<div>WF already running</div>");
+    this.disable = function (status) {
+        var siteUrl = _spPageContextInfo.siteServerRelativeUrl;
+        var html = "";
+        if (status == 2)// In Progress checknames.png
+            html = "<img src='" + siteUrl + "/siteassets/gs/wf_in_progress_16x16.jpg' title='En attente de validation auprès de votre manager.' />";
+        else if (status == 5 || status == 16) // completed or approved
+            html = "<img src='" + siteUrl + "/_layouts/15/images/componentactive.png' title='la demande a été approuvée.' />";
+        else if (status == 4 || status == 17 || status == 15) // canceled or rejected 
+            html = "<img src='" + siteUrl + "/_layouts/15/images/componentdegraded.png' title='La demande a été rejetée ou annulée.' />";
+        else
+            html = "<img src='" + siteUrl + "/_layouts/15/images/removeitem.gif' title='La demande a été rejetée ou annulée.' />";
+
+        $("#" + this.id).html(html);
     }
 
     this.enable = function () {
         var img = document.createElement("img");
+        img.id = "GSIMG" + this.itemId
         img.src = '/_layouts/15/images/discoveryUpdateStats_16x16.png';
+        img.className = 'wiggle';
 
         var a = document.createElement("a");
         a.appendChild(img);
-        a.title = "submit to manager";
+        a.title = "Envoyer la demande à votre manager.";
         a.href = "#";
 
         a.setAttribute('onclick', 'var x = new GSWorkflow(' + this.itemId + '); x.SendToManager();');
@@ -98,13 +129,38 @@ function GSWorkflowRenderer(ctx) {
         div.id = this.id;
         div.appendChild(a);
 
+        this.shake(img.id);
+
         $("#" + this.id).html(div.outerHTML);
-    }
+    }.bind(this);
+
+    this.shake = function (id) {
+        
+        function wiggleForOneSecond(el) {
+            el.ClassyWiggle();
+            setTimeout(function () { el.ClassyWiggle('stop') }, 1000)
+        }
+
+        setInterval(function () { wiggleForOneSecond($('#'+ id)) }, 5000);
+
+
+
+        //var classname = 'shake';
+        //var icon = $("#" + id);
+        //if (icon.hasClass(classname)) {
+        //    icon.removeClass(classname);
+        //    setTimeout(self.shake.bind(this, id), 3000);
+        //}
+        //else {
+        //    icon.addClass(classname);
+        //    setTimeout(self.shake.bind(this, id), 1000);
+        //}
+    }.bind(this);
 
     this.render = function () {
         this.getStatus();
         var siteUrl = _spPageContextInfo.siteServerRelativeUrl;
-        return "<div id=" + this.id + "><img src='" + siteUrl + "/siteassets/gs/ajax-loader-fb.gif' /></div>";
+        return "<div id=" + this.id + " style='text-align: center;'><img src='" + siteUrl + "/siteassets/gs/ajax-loader-fb.gif' /></div>";
     }
 }
 
@@ -199,7 +255,7 @@ function GSWorkflow(item_id) {
     }
 
     this.getAssocData = function (name, login) {
-        
+
         var assocData = '<dfs:myFields xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dms="http://schemas.microsoft.com/office/2009/documentManagement/types" xmlns:dfs="http://schemas.microsoft.com/office/infopath/2003/dataFormSolution" xmlns:q="http://schemas.microsoft.com/office/infopath/2009/WSSList/queryFields" xmlns:d="http://schemas.microsoft.com/office/infopath/2009/WSSList/dataFields" xmlns:ma="http://schemas.microsoft.com/office/2009/metadata/properties/metaAttributes" xmlns:pc="http://schemas.microsoft.com/office/infopath/2007/PartnerControls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
                         '<dfs:queryFields></dfs:queryFields>' +
                         '<dfs:dataFields>' +
@@ -214,7 +270,7 @@ function GSWorkflow(item_id) {
                         '</d:Assignment>' +
                         '</d:Approvers>' +
                         '<d:ExpandGroups>true</d:ExpandGroups>' +
-                        '<d:NotificationMessage>Please approve</d:NotificationMessage>' +
+                        '<d:NotificationMessage>Please approve <a href="#1">test</a></d:NotificationMessage>' +
                         '<d:DueDateforAllTasks xsi:nil="true" /><d:DurationforSerialTasks xsi:nil="true" />' +
                         '<d:DurationUnits>Day</d:DurationUnits>' +
                         '<d:CC />' +
@@ -270,7 +326,7 @@ function GSWorkflow(item_id) {
     this.spservices = function (approverName, loginName) {
 
         if (loginName != null) {
-                        
+
             var assocData = this.getAssocData(approverName, loginName);
             var fileRef = "http://" + location.host + this.item.get_item("FileRef");
 
@@ -295,4 +351,14 @@ function GSWorkflow(item_id) {
         }.bind(this), 1000);
 
     };
+}
+
+function GSWorkFlowNewFormRenderer(ctx) {
+
+    this.init = function () {
+        console.log("new form");
+
+        return "<div>Hello</div>";
+    };
+
 }

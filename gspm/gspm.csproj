@@ -64,7 +64,7 @@
       <FeatureId>{dfc89cf8-0013-4c89-a2aa-d30b402e099a}</FeatureId>
     </None>
     <None Include="key.snk" />
-    <None Include="Module1\SharePointProjectItem.spdata">
+    <None Include="SiteAssets\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{8079f114-b24f-48be-91d9-9f82392848be}</SharePointProjectItemId>
     </None>
     <None Include="Package\Package.package">
@@ -81,14 +81,17 @@
     <Content Include="Features\Validation Button\Validation Button.Template.xml">
       <DependentUpon>Validation Button.feature</DependentUpon>
     </Content>
-    <Content Include="Module1\ajax-loader-fb.gif" />
-    <Content Include="Module1\Elements.xml" />
-    <Content Include="Module1\gs-init.js" />
-    <Content Include="Module1\gs.wf.jslink - Copy.js" />
-    <Content Include="Module1\gs.wf.jslink.js" />
-    <Content Include="Module1\jquery-3.2.1.min.js" />
-    <Content Include="Module1\jquery.SPServices.js" />
-    <Content Include="Module1\logo-go_sports.jpg" />
+    <Content Include="SiteAssets\gs\ajax-loader-fb.gif" />
+    <Content Include="SiteAssets\Elements.xml" />
+    <Content Include="SiteAssets\gs\gs-init.js" />
+    <Content Include="SiteAssets\gs\gs.css" />
+    <Content Include="SiteAssets\gs\gs.wf.jslink - Copy.js" />
+    <Content Include="SiteAssets\gs\gs.wf.jslink.js" />
+    <Content Include="SiteAssets\gs\jquery-3.2.1.min.js" />
+    <Content Include="SiteAssets\gs\jquery.classywiggle.js" />
+    <Content Include="SiteAssets\gs\jquery.SPServices.js" />
+    <Content Include="SiteAssets\gs\logo-go_sports.jpg" />
+    <Content Include="SiteAssets\gs\wf_in_progress_16x16.jpg" />
     <Content Include="XMLFile1.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
