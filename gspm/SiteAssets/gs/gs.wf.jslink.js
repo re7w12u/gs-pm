@@ -156,6 +156,7 @@ function GSWorkflow(item_id) {
     this.item = null;
     this.workflow = null;
     this.currentUser = null;
+    this.manager = null;
 
     // config rdits-sp13-dev2 - JULIEN
     this.workflowName = "Approbation 2010";
@@ -195,29 +196,22 @@ function GSWorkflow(item_id) {
 
     this.getId = function () {
         return "GSLink" + this.itemId;
-    }
+    };
 
     this.getManagerInfo = function () {
+        var d = $.Deferred();
         // get selected manager info
-        var managerName = this.item.get_item("Manager").get_lookupValue();
+        //var managerName = this.item.get_item("Manager").get_lookupValue();
         var managerId = this.item.get_item("Manager").get_lookupId();
-        var manager = this.web.getUserById(managerId);
+        this.manager = this.web.getUserById(managerId);
 
-        this.context.load(manager);
-        let self = this;
+        this.context.load(this.manager);
         this.context.executeQueryAsync(
-            function () {
-                var login = manager.get_loginName();
-                var email = manager.get_email();
-                var xml = self.getAssocData(managerName, login);
-                this.spservices(managerName, login);
-                //this.triggerWF(xml);
-            }.bind(this),
-            function (sender, args) {
-                console.error("ERROR 3: " + args.get_message());
-            });
-    }
-    
+            function () { d.resolve(); }.bind(this),
+            function (sender, args) { console.error("ERROR 3: " + args.get_message()); });
+        return d.promise();
+    };
+
     this.getAssocData = function (name, login) {
 
         var assocData = '<dfs:myFields xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dms="http://schemas.microsoft.com/office/2009/documentManagement/types" xmlns:dfs="http://schemas.microsoft.com/office/infopath/2003/dataFormSolution" xmlns:q="http://schemas.microsoft.com/office/infopath/2009/WSSList/queryFields" xmlns:d="http://schemas.microsoft.com/office/infopath/2009/WSSList/dataFields" xmlns:ma="http://schemas.microsoft.com/office/2009/metadata/properties/metaAttributes" xmlns:pc="http://schemas.microsoft.com/office/infopath/2007/PartnerControls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
@@ -254,7 +248,7 @@ function GSWorkflow(item_id) {
     };
 
     this.setItemAsReadOnly = function () {
-        this.getItem().done(function () {
+        this.getItem().then(this.getManagerInfo.bind(this)).then(function () {
             // break inheritance
             this.item.breakRoleInheritance(true);
 
@@ -284,8 +278,10 @@ function GSWorkflow(item_id) {
                 var readRole = roleDef.getByName('Read');
                 var collRoleDefinitionBinding = SP.RoleDefinitionBindingCollection.newObject(this.context);
                 collRoleDefinitionBinding.add(readRole);
-                this.item.get_roleAssignments().add(this.currentUser, collRoleDefinitionBinding);
 
+                this.item.get_roleAssignments().add(this.currentUser, collRoleDefinitionBinding);
+                this.item.get_roleAssignments().add(this.manager, collRoleDefinitionBinding);
+                
                 this.context.executeQueryAsync(
                     Function.createDelegate(this, function () {
                         SP.UI.Notify.addNotification('Your item has been set to read only.<br>Your page will be automatically refreshed...', false);
@@ -296,30 +292,22 @@ function GSWorkflow(item_id) {
 
             }));
 
-        }.bind(this));
-
-        //
-        //GSPMS.item.get_roleAssignments().getByPrincipal(GSPMS.currentUser).deleteObject();
-
-        ////var collRoleDefinitionBinding = SP.RoleDefinitionBindingCollection.newObject(GSPMS.context)
-        ////collRoleDefinitionBinding.add(GSPMS.web.get_roleDefinitions().getByType(SP.RoleType.reader));
-
-        ////GSPMS.item.get_roleAssignments().add(GSPMS.currentUser, collRoleDefinitionBinding);
-        ////GSPMS.context.load(GSPMS.currentUser);
-        ////GSPMS.context.load(GSPMS.item);
-
-        //GSPMS.context.executeQueryAsync(
-        //    function () {
-        //        console.log("item set as read only");
-        //        SP.UI.Notify.addNotification('item set as read only', false);
-        //}, function (sender, args) {
-        //    console.error("ERROR 4 : " + args.get_message());
-        //});
+        }.bind(this));  
     }
 
     // run this method to start all process
     this.SendToManager = function () {
-        this.getItem().done(this.getManagerInfo.bind(this));
+        this.getItem()
+            .then(this.getManagerInfo.bind(this))
+            .then(this.triggerWf.bind(this));;
+    };
+
+    this.triggerWf = function () {
+        var login = this.manager.get_loginName();
+        var email = this.manager.get_email();
+        var name = this.manager.get_title();
+        var xml = this.getAssocData(name, login);
+        this.spservices(name, login);
     };
 
     ///https://gist.github.com/madhur/1584225
