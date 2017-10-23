@@ -41,10 +41,17 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Activities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.DesignTime.Activities, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel.Activities" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.SharePoint" />
@@ -74,7 +81,6 @@
       <DependentUpon>Package.package</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="CustomAction\Elements.xml" />
     <Content Include="Definitions\Fields\Elements.xml" />
@@ -83,14 +89,12 @@
     </Content>
     <Content Include="SiteAssets\gs\ajax-loader-fb.gif" />
     <Content Include="SiteAssets\Elements.xml" />
-    <Content Include="SiteAssets\gs\gs-init.js" />
     <Content Include="SiteAssets\gs\gs.wf.jslink.js" />
     <Content Include="SiteAssets\gs\jquery-3.2.1.min.js" />
     <Content Include="SiteAssets\gs\jquery.classywiggle.js" />
     <Content Include="SiteAssets\gs\jquery.SPServices.js" />
     <Content Include="SiteAssets\gs\logo-go_sports.jpg" />
     <Content Include="SiteAssets\gs\wf_in_progress_16x16.jpg" />
-    <Content Include="XMLFile1.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

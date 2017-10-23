@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
   <Module Name="SiteAssets" >
-    <File Path="SiteAssets\gs\gs-init.js" Url="SiteAssets/gs/gs-init.js" />
     <File Path="SiteAssets\gs\logo-go_sports.jpg" Url="SiteAssets/gs/logo-go_sports.jpg" />
     <File Path="SiteAssets\gs\gs.wf.jslink.js" Url="SiteAssets/gs/gs.wf.jslink.js" />
     <File Path="SiteAssets\gs\jquery-3.2.1.min.js" Url="SiteAssets/gs/jquery-3.2.1.min.js" />

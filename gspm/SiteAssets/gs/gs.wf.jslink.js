@@ -159,18 +159,18 @@ function GSWorkflow(item_id) {
 
     /***** PARAMETERS *****/
     // config rdits-sp13-dev2 - JULIEN
-    //this.workflowName = "Approbation 2010";
-    //this.wfDefinitionId = "{98D90551-EA55-46A3-A6D0-743C30C008DA}";
-    //this.managerInternalField = "Manager";
+    this.workflowName = "Approbation 2010";
+    this.wfDefinitionId = "{98D90551-EA55-46A3-A6D0-743C30C008DA}";
+    this.managerInternalField = "Manager";
 
     //// config rdits-sp13-dev3 - CLE
     //this.workflowName = "Approval 2010";
     //this.wfDefinitionId = "{E47E17E2-B00D-4D61-BED9-065B3DDC1849}";
 
     // jbes online
-    this.workflowName = "Approbation 2010";
-    this.wfDefinitionId = "{9279E1FF-1D32-4423-85B7-C7F21998A701}";
-    this.managerInternalField = "Nom_x0020_du_x0020_manager";
+    //this.workflowName = "Approbation 2010";
+    //this.wfDefinitionId = "{9279E1FF-1D32-4423-85B7-C7F21998A701}";
+    //this.managerInternalField = "Nom_x0020_du_x0020_manager";
 
 
     /****** END OF PARAMETERS - DO NOT EDIT BELOW UNLESS YOU KNOW MORE OR LESS WHAT YOU ARE DOING *****/
@@ -184,6 +184,7 @@ function GSWorkflow(item_id) {
     this.workflow = null;
     this.currentUser = null;
     this.manager = null;
+    this.dlg = null;
 
     this.getItem = function () {
         var d = $.Deferred();
@@ -244,7 +245,7 @@ function GSWorkflow(item_id) {
                         '</d:Assignment>' +
                         '</d:Approvers>' +
                         '<d:ExpandGroups>true</d:ExpandGroups>' +
-                        '<d:NotificationMessage>Please approve <a href="#1">test</a></d:NotificationMessage>' +
+                        '<d:NotificationMessage>Please approve</d:NotificationMessage>' +
                         '<d:DueDateforAllTasks xsi:nil="true" /><d:DurationforSerialTasks xsi:nil="true" />' +
                         '<d:DurationUnits>Day</d:DurationUnits>' +
                         '<d:CC />' +
@@ -264,6 +265,7 @@ function GSWorkflow(item_id) {
     };
 
     this.setItemAsReadOnly = function () {
+        var d = $.Deferred();
         this.getItem().then(this.getManagerInfo.bind(this)).then(function () {
             // break inheritance
             this.item.breakRoleInheritance(true);
@@ -300,7 +302,8 @@ function GSWorkflow(item_id) {
 
                 this.context.executeQueryAsync(
                     Function.createDelegate(this, function () {
-                        SP.UI.Notify.addNotification('Your item has been set to read only.<br>Your page will be automatically refreshed...', false);
+                        d.resolve();
+                        //SP.UI.Notify.addNotification('Your item has been set to read only.<br>Your page will be automatically refreshed...', false);
                     }),
                     Function.createDelegate(this, function (s, a) {
                         console.error(a.get_message());
@@ -309,30 +312,34 @@ function GSWorkflow(item_id) {
             }));
 
         }.bind(this));
+
+        return d.promise();
     }
 
     // run this method to start all process
     this.SendToManager = function () {
+        this.dlg = SP.UI.ModalDialog.showWaitScreenWithNoClose("Please wait...", "starting approval process...", null, null);
         this.getItem()
             .then(this.getManagerInfo.bind(this))
-            .then(this.triggerWf.bind(this));;
+            .then(this.triggerWf.bind(this));
+        //.then(this.triggerAPIWF.bind(this));
     };
 
     this.triggerWf = function () {
         var login = this.manager.get_loginName();
         var email = this.manager.get_email();
         var name = this.manager.get_title();
-        var xml = this.getAssocData(name, login);
         this.spservices(name, login);
     };
 
     ///https://gist.github.com/madhur/1584225
     this.spservices = function (approverName, loginName) {
+        console.log("triggering wf using $().SPService");
 
         if (loginName != null) {
 
             var assocData = this.getAssocData(approverName, loginName);
-            var fileRef = "http://" + location.host + this.item.get_item("FileRef");
+            var fileRef = location.protocol + "//" + location.host + this.item.get_item("FileRef");
 
             $().SPServices({
                 operation: "StartWorkflow",
@@ -342,36 +349,70 @@ function GSWorkflow(item_id) {
                 completefunc: this.onWFStarted.bind(this)
             });
 
-
-
         };
     }
 
     this.onWFStarted = function () {
-        SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
-        this.setItemAsReadOnly();
-        //setTimeout(function () { location.reload(true); }, 3000);
+        //SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
+        this.setItemAsReadOnly().then(function () {
+            this.dlg.close();
+            setTimeout(function () { location.reload(true); }, 1);
+        }.bind(this));
     };
 
 
     // Attempt to start workflow using client API... not to avail !!
-    //this.triggerWF = function (xml) {
+    this.triggerAPIWF = function () {
+        console.log("triggering wf using jsom api");
 
-    //    //Workflow Services Manager
-    //    var wfServicesManager = new SP.WorkflowServices.WorkflowServicesManager(this.context, this.web);
+        var login = this.manager.get_loginName();
+        var email = this.manager.get_email();
+        var name = this.manager.get_title();
+        var xml = this.getAssocData(name, login);
 
-    //    //Workflow Interop Service used to interact with SharePoint 2010 Engine Workflows
-    //    var interopService = wfServicesManager.getWorkflowInteropService()
-    //    itemGuid = this.item.get_item("GUID").toString();
-    //    //Start the Site Workflow by Passing the name of the Workflow and the initiation Parameters.
-    //    interopService.startWorkflow(this.workflowName, null, this.listId, itemGuid, xml);
+        itemGuid = this.item.get_item("GUID").toString();
 
-    //    this.context.executeQueryAsync(
-    //        this.onWFStarted.bind(this),
-    //        function (sender, args) {
-    //            console.error("ERROR 2: " + args.get_message());
-    //        });
-    //}
+        //Workflow Services Manager
+        var wfServicesManager = new SP.WorkflowServices.WorkflowServicesManager(this.context, this.web);
+
+        var subscription = wfServicesManager.getWorkflowSubscriptionService().getSubscription(this.wfDefinitionId);
+
+        this.context.load(subscription);
+
+        this.context.executeQueryAsync(
+            function (sender, args) {
+                console.log("Subscription load success. Attempting to start workflow.");
+                var inputParameters = {};
+
+                wfServicesManager.getWorkflowInstanceService().startWorkflowOnListItem(subscription, itemGuid, xml);
+
+                this.context.executeQueryAsync(
+                    function (sender, args) { console.log("Successfully starting workflow."); },
+                    function (sender, args) {
+                        console.log("Failed to start workflow.");
+                        console.log("Error: " + args.get_message() + "\n" + args.get_stackTrace());
+                    }
+                );
+            }.bind(this),
+        function (sender, args) {
+            console.log("Failed to load subscription.");
+            console.log("Error: " + args.get_message() + "\n" + args.get_stackTrace());
+        }
+    );
+
+        ////Workflow Interop Service used to interact with SharePoint 2010 Engine Workflows
+        //var interopService = wfServicesManager.getWorkflowInteropService()
+        //itemGuid = this.item.get_item("GUID").toString();
+        ////Start the Site Workflow by Passing the name of the Workflow and the initiation Parameters.
+        //var wfName = "Workflow1 - Workflow Start";
+        //interopService.startWorkflow(wfName, null, this.listId, itemGuid, {});
+
+        //this.context.executeQueryAsync(
+        //    this.onWFStarted.bind(this),
+        //    function (sender, args) {
+        //        console.error("ERROR 2: " + args.get_message());
+        //    });
+    }
 }
 
 function GSWorkFlowNewFormRenderer(ctx) {
