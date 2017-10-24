@@ -15,10 +15,14 @@ GSG.renderer = [];
                 GSG.renderer.push(r);
                 return r.render();
             },
-            //'NewForm': function () {
-            //    var n = new GSWorkFlowNewFormRenderer(ctx)
-            //    return n.init();
-            //}
+            'NewForm': function () {
+                var n = new GSWorkFlowFormRenderer(ctx)
+                return n.init();
+            },
+            'EditForm': function () {
+                var n = new GSWorkFlowFormRenderer(ctx)
+                return n.init();
+            }
         }
     };
 
@@ -87,12 +91,13 @@ function GSWorkflowRenderer(ctx) {
                 if (this.debug || status == undefined || status == 0) this.enable();
                 else this.disable(status);
 
+                // for debug purpose only - display direct link to set item as read only - skip workflow trigger
                 //var ro = $("<a href='#' id='RO" + this.itemId + "'>READONLY</a>");
                 //ro.click(function () {
                 //    var gs = new GSWorkflow(this.itemId);
                 //    gs.setItemAsReadOnly();
                 //}.bind(this));
-                //$("#" + this.id).append(ro);
+                //$("#" + this.id).html(ro);
 
             }.bind(this),
             error: function () {
@@ -159,18 +164,14 @@ function GSWorkflow(item_id) {
 
     /***** PARAMETERS *****/
     // config rdits-sp13-dev2 - JULIEN
-    this.workflowName = "Approbation 2010";
-    this.wfDefinitionId = "{98D90551-EA55-46A3-A6D0-743C30C008DA}";
-    this.managerInternalField = "Manager";
-
-    //// config rdits-sp13-dev3 - CLE
-    //this.workflowName = "Approval 2010";
-    //this.wfDefinitionId = "{E47E17E2-B00D-4D61-BED9-065B3DDC1849}";
-
-    // jbes online
     //this.workflowName = "Approbation 2010";
-    //this.wfDefinitionId = "{9279E1FF-1D32-4423-85B7-C7F21998A701}";
-    //this.managerInternalField = "Nom_x0020_du_x0020_manager";
+    //this.wfDefinitionId = "{98D90551-EA55-46A3-A6D0-743C30C008DA}";
+    //this.managerInternalField = "Manager";
+
+    //jbes online
+    this.workflowName = "Approbation 2010";
+    this.wfDefinitionId = "{9279E1FF-1D32-4423-85B7-C7F21998A701}";
+    this.managerInternalField = "Nom_x0020_du_x0020_manager";
 
 
     /****** END OF PARAMETERS - DO NOT EDIT BELOW UNLESS YOU KNOW MORE OR LESS WHAT YOU ARE DOING *****/
@@ -217,8 +218,8 @@ function GSWorkflow(item_id) {
 
     this.getManagerInfo = function () {
         var d = $.Deferred();
+
         // get selected manager info
-        //var managerName = this.item.get_item("Manager").get_lookupValue();
         var managerId = this.item.get_item(this.managerInternalField).get_lookupId();
         this.manager = this.web.getUserById(managerId);
 
@@ -266,7 +267,9 @@ function GSWorkflow(item_id) {
 
     this.setItemAsReadOnly = function () {
         var d = $.Deferred();
-        this.getItem().then(this.getManagerInfo.bind(this)).then(function () {
+
+        var exec = function () {
+            console.log("changing item permissions...")
             // break inheritance
             this.item.breakRoleInheritance(true);
 
@@ -311,7 +314,11 @@ function GSWorkflow(item_id) {
 
             }));
 
-        }.bind(this));
+        };
+
+        this.getItem()
+            .then(this.getManagerInfo.bind(this))
+            .then(exec.bind(this));
 
         return d.promise();
     }
@@ -334,7 +341,7 @@ function GSWorkflow(item_id) {
 
     ///https://gist.github.com/madhur/1584225
     this.spservices = function (approverName, loginName) {
-        console.log("triggering wf using $().SPService");
+        console.log("triggering wf using $().SPService. Wait for response...");
 
         if (loginName != null) {
 
@@ -353,6 +360,7 @@ function GSWorkflow(item_id) {
     }
 
     this.onWFStarted = function () {
+        console.log("workflow request completed. Proceeding...")
         //SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
         this.setItemAsReadOnly().then(function () {
             this.dlg.close();
@@ -415,12 +423,11 @@ function GSWorkflow(item_id) {
     }
 }
 
-function GSWorkFlowNewFormRenderer(ctx) {
+function GSWorkFlowFormRenderer(ctx) {
 
     this.init = function () {
-        console.log("new form");
-
-        return "<div>Hello</div>";
+        var url = _spPageContextInfo.siteServerRelativeUrl + '/_layouts/15/images/discoveryUpdateStats_16x16.png';
+        return "<div>Une fois votre demande sauvegardée, cliquez sur l'icône <img src='" + url + "'> qui se trouve dans la liste afin de soumettre votre demande à votre manager.</div>";
     };
 
 }
