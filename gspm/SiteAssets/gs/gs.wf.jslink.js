@@ -2,18 +2,21 @@
 
 /***** PARAMETERS *****/
 
+// PROD
 GSG.param = {
     workflowName: "Approbation demande",
     wfDefinitionId: "{655D90D5-BDE3-445C-B042-C57BDBCB116D}",
     managerInternalField: "Nom_x0020_du_x0020_manager"
 };
 
+// DEV
 //GSG.param = {
 //    workflowName: "Approbation 2010",
 //    wfDefinitionId: "{98D90551-EA55-46A3-A6D0-743C30C008DA}",
 //    managerInternalField: "Manager"
 //};
 
+// TEST ONLINE
 //GSG.param = {
 //    workflowName: "Approbation 2010",
 //    wfDefinitionId: "{9279E1FF-1D32-4423-85B7-C7F21998A701}",
@@ -89,9 +92,8 @@ function GSWorkflowRenderer(ctx) {
     this.getStatus = function () {
 
         var wfInternalName = this.ctx.ListSchema.Field.find(function (i) { return i.DisplayName == GSG.param.workflowName; }).Name;
-        //var wfInternalName = this.ctx.ListSchema.Field.find(function (i) { return i.DisplayName == "Approval 2010"; }).Name;
 
-        var url = _spPageContextInfo.siteServerRelativeUrl + "/_api/web/lists('" + ctx.listName + "')/items(" + this.itemId + ")?$select=" + wfInternalName;
+        var url = _spPageContextInfo.siteServerRelativeUrl + "/_api/web/lists('" + ctx.listName + "')/items(" + this.itemId + ")?$select=" + wfInternalName + "&rdmtkn=" + (new Date()).getTime();
 
         $.ajax({
             url: url,
@@ -441,4 +443,51 @@ function GSWorkFlowFormRenderer(ctx) {
         return "<div>Une fois votre demande sauvegardée, cliquez sur l'icône <img src='" + url + "'> qui se trouve dans la liste afin de soumettre votre demande à votre manager.</div>";
     };
 
+}
+
+
+// fix IE missing array find method implementation
+// https://tc39.github.io/ecma262/#sec-array.prototype.find
+if (!Array.prototype.find) {
+    Object.defineProperty(Array.prototype, 'find', {
+        value: function (predicate) {
+            // 1. Let O be ? ToObject(this value).
+            if (this == null) {
+                throw new TypeError('"this" is null or not defined');
+            }
+
+            var o = Object(this);
+
+            // 2. Let len be ? ToLength(? Get(O, "length")).
+            var len = o.length >>> 0;
+
+            // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+            if (typeof predicate !== 'function') {
+                throw new TypeError('predicate must be a function');
+            }
+
+            // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+            var thisArg = arguments[1];
+
+            // 5. Let k be 0.
+            var k = 0;
+
+            // 6. Repeat, while k < len
+            while (k < len) {
+                // a. Let Pk be ! ToString(k).
+                // b. Let kValue be ? Get(O, Pk).
+                // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+                // d. If testResult is true, return kValue.
+                var kValue = o[k];
+                if (predicate.call(thisArg, kValue, k, o)) {
+                    return kValue;
+                }
+                // e. Increase k by 1.
+                k++;
+            }
+
+            // 7. Return undefined.
+            return undefined;
+        }
+    });
 }
