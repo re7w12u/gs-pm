@@ -1,4 +1,29 @@
 ﻿var GSG = GSG || {};
+
+/***** PARAMETERS *****/
+
+GSG.param = {
+    workflowName: "Approbation demande",
+    wfDefinitionId: "{655D90D5-BDE3-445C-B042-C57BDBCB116D}",
+    managerInternalField: "Nom_x0020_du_x0020_manager"
+};
+
+//GSG.param = {
+//    workflowName: "Approbation 2010",
+//    wfDefinitionId: "{98D90551-EA55-46A3-A6D0-743C30C008DA}",
+//    managerInternalField: "Manager"
+//};
+
+//GSG.param = {
+//    workflowName: "Approbation 2010",
+//    wfDefinitionId: "{9279E1FF-1D32-4423-85B7-C7F21998A701}",
+//    managerInternalField: "Nom_x0020_du_x0020_manager"
+//};
+
+
+/****** END OF PARAMETERS - DO NOT EDIT BELOW UNLESS YOU KNOW MORE OR LESS WHAT YOU ARE DOING *****/
+
+
 GSG.renderer = [];
 
 (function () {
@@ -63,7 +88,7 @@ function GSWorkflowRenderer(ctx) {
 
     this.getStatus = function () {
 
-        var wfInternalName = this.ctx.ListSchema.Field.find(function (i) { return i.DisplayName == "Approbation 2010"; }).Name;
+        var wfInternalName = this.ctx.ListSchema.Field.find(function (i) { return i.DisplayName == GSG.param.workflowName; }).Name;
         //var wfInternalName = this.ctx.ListSchema.Field.find(function (i) { return i.DisplayName == "Approval 2010"; }).Name;
 
         var url = _spPageContextInfo.siteServerRelativeUrl + "/_api/web/lists('" + ctx.listName + "')/items(" + this.itemId + ")?$select=" + wfInternalName;
@@ -162,20 +187,6 @@ function GSWorkflowRenderer(ctx) {
 
 function GSWorkflow(item_id) {
 
-    /***** PARAMETERS *****/
-    // config rdits-sp13-dev2 - JULIEN
-    //this.workflowName = "Approbation 2010";
-    //this.wfDefinitionId = "{98D90551-EA55-46A3-A6D0-743C30C008DA}";
-    //this.managerInternalField = "Manager";
-
-    //jbes online
-    this.workflowName = "Approbation 2010";
-    this.wfDefinitionId = "{9279E1FF-1D32-4423-85B7-C7F21998A701}";
-    this.managerInternalField = "Nom_x0020_du_x0020_manager";
-
-
-    /****** END OF PARAMETERS - DO NOT EDIT BELOW UNLESS YOU KNOW MORE OR LESS WHAT YOU ARE DOING *****/
-
     this.itemId = item_id;
     this.web = null;
     this.context = null;
@@ -220,7 +231,7 @@ function GSWorkflow(item_id) {
         var d = $.Deferred();
 
         // get selected manager info
-        var managerId = this.item.get_item(this.managerInternalField).get_lookupId();
+        var managerId = this.item.get_item(GSG.param.managerInternalField).get_lookupId();
         this.manager = this.web.getUserById(managerId);
 
         this.context.load(this.manager);
@@ -351,7 +362,7 @@ function GSWorkflow(item_id) {
             $().SPServices({
                 operation: "StartWorkflow",
                 item: fileRef,
-                templateId: this.wfDefinitionId,
+                templateId: GSG.param.wfDefinitionId,
                 workflowParameters: assocData,
                 completefunc: this.onWFStarted.bind(this)
             });
@@ -362,10 +373,10 @@ function GSWorkflow(item_id) {
     this.onWFStarted = function () {
         console.log("workflow request completed. Proceeding...")
         //SP.UI.Notify.addNotification('Your element has been submitted to your manager.', false);
-        this.setItemAsReadOnly().then(function () {
-            this.dlg.close();
-            setTimeout(function () { location.reload(true); }, 1);
-        }.bind(this));
+        //this.setItemAsReadOnly().then(function () {
+        //this.dlg.close();
+        setTimeout(function () { location.reload(true); }, 500);
+        //}.bind(this));
     };
 
 
@@ -383,7 +394,7 @@ function GSWorkflow(item_id) {
         //Workflow Services Manager
         var wfServicesManager = new SP.WorkflowServices.WorkflowServicesManager(this.context, this.web);
 
-        var subscription = wfServicesManager.getWorkflowSubscriptionService().getSubscription(this.wfDefinitionId);
+        var subscription = wfServicesManager.getWorkflowSubscriptionService().getSubscription(GSG.param.wfDefinitionId);
 
         this.context.load(subscription);
 
