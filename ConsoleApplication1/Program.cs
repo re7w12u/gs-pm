@@ -16,7 +16,7 @@ namespace ConsoleApplication1
         {
 
             StartWFOnPremise();
-            StartWFOnLine();
+            //StartWFOnLine();
         }
 
         private static void StartWFOnLine()
@@ -111,6 +111,14 @@ namespace ConsoleApplication1
 
                 Web web = clientContext.Web;
 
+                List list = web.Lists.GetByTitle(targetListName);
+                ListItem item = list.GetItemById(19);
+
+                clientContext.Load(item);
+                clientContext.ExecuteQuery();
+
+                string guid = item["GUID"].ToString();
+
                 //Workflow Services Manager which will handle all the workflow interaction.
                 WorkflowServicesManager wfServicesManager = new WorkflowServicesManager(clientContext, web);
 
@@ -128,11 +136,23 @@ namespace ConsoleApplication1
                 InteropService workflowInteropService = wfServicesManager.GetWorkflowInteropService();
 
                 var initiationData = new Dictionary<string, object>();
+                initiationData.Add("DisplayName", "Julien Bessiere");
+                initiationData.Add("AccountId", "i:0#.f|membership|julien@jbes.onmicrosoft.com");
+                initiationData.Add("AccountType", "User");
 
                 //Start the Workflow
-                ClientResult<Guid> resultGuid = workflowInteropService.StartWorkflow(wfAssociation.Name, new Guid(), targetListGUID, targetItemGUID, initiationData);
+                ClientResult<Guid> resultGuid = workflowInteropService.StartWorkflow(wfAssociation.Name, new Guid(), targetListGUID, Guid.Parse(guid), initiationData);
 
-                clientContext.ExecuteQuery();
+                try
+                {
+                    clientContext.ExecuteQuery();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+
+
             }
         }
     }
